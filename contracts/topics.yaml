@@ -1,0 +1,6 @@
+topics:
+  - name: trades.raw
+    producer: pminspect
+    schema_ref: schemas/polymarket/trade/v1/schema.json
+    notes: Raw Polymarket trade events from publisher.
+
