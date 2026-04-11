@@ -6,13 +6,13 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SCHEMA_PATH = ROOT / "schemas" / "polymarket" / "trade" / "v1" / "schema.json"
+SCHEMA_PATH = ROOT / "schemas" / "polymarket" / "trade" / "v1.0.0" / "schema.json"
 VALID_EXAMPLE = (
     ROOT
     / "schemas"
     / "polymarket"
     / "trade"
-    / "v1"
+    / "v1.0.0"
     / "examples"
     / "valid.json"
 )
@@ -21,7 +21,7 @@ INVALID_EXAMPLE = (
     / "schemas"
     / "polymarket"
     / "trade"
-    / "v1"
+    / "v1.0.0"
     / "examples"
     / "invalid-missing-field.json"
 )
