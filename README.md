@@ -16,16 +16,17 @@ ci/           # CI workflows for schema checks
 
 ## Current event contract
 
-- `schemas/polymarket/trade/v1/schema.json`
+- `schemas/polymarket/trade/v1.0.0/schema.json`
+  - semantic version path format: `v<major>.<minor>.<patch>`
 - examples:
-  - `schemas/polymarket/trade/v1/examples/valid.json`
-  - `schemas/polymarket/trade/v1/examples/invalid-missing-field.json`
+  - `schemas/polymarket/trade/v1.0.0/examples/valid.json`
+  - `schemas/polymarket/trade/v1.0.0/examples/invalid-missing-field.json`
 
 ## Usage model
 
 1. Publisher emits payloads that conform to the schema.
 2. Listener validates/deserializes against the same schema contract.
-3. Breaking changes create a new version folder (`v2`) without mutating `v1`.
+3. Breaking changes create a new version folder (for example `v2.0.0`) without mutating prior versions.
 
 ## Considerations
 

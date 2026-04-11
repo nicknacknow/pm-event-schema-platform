@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "pm-event-schema-platform/schemas/polymarket/trade/v1/schema.json",
-  "title": "polymarket.trade.v1",
+  "$id": "pm-event-schema-platform/schemas/polymarket/trade/v1.0.0/schema.json",
+  "title": "polymarket.trade.v1.0.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -14,7 +14,7 @@
       "const": "trade"
     },
     "event_version": {
-      "const": 1
+      "const": "1.0.0"
     },
     "trade": {
       "type": "object",

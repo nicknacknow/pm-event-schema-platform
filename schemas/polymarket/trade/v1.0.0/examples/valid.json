@@ -1,6 +1,6 @@
 {
   "event_type": "trade",
-  "event_version": 1,
+  "event_version": "1.0.0",
   "trade": {
     "block_number": 82889791,
     "timestamp": "2026-02-12T12:33:25+00:00",
