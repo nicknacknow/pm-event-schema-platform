@@ -15,4 +15,6 @@ jobs:
           python-version: "3.12"
       - name: Validate schema repo
         run: python tooling/validate_schemas.py
+      - name: Validate negative schema fixtures
+        run: python tooling/test_validate_schemas_negative.py
 
