@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMAS_ROOT = ROOT / "schemas"
+SEMVER_FOLDER_RE = re.compile(r"^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
 
 
 def _load_json(path: Path) -> dict:
@@ -27,33 +29,56 @@ def _discover_schema_paths() -> list[Path]:
     return schema_paths
 
 
+def _schema_coordinates(schema_path: Path) -> tuple[str, str, str]:
+    relative_parts = schema_path.relative_to(SCHEMAS_ROOT).parts
+    if len(relative_parts) != 4 or relative_parts[3] != "schema.json":
+        raise ValueError(
+            f"{schema_path}: expected schemas/<domain>/<event>/v<major>.<minor>.<patch>/schema.json"
+        )
+
+    domain, event, folder_version, _ = relative_parts
+    if not SEMVER_FOLDER_RE.fullmatch(folder_version):
+        raise ValueError(
+            f"{schema_path}: version folder {folder_version!r} is not a semantic version "
+            "in the form v<major>.<minor>.<patch>"
+        )
+
+    return domain, event, folder_version
+
+
 def _assert_version_metadata(schema_path: Path, schema: dict) -> str:
-    folder_version = schema_path.parent.name
+    domain, event, folder_version = _schema_coordinates(schema_path)
+    schema_version = folder_version[1:]
     properties = schema["properties"]
+    _assert_required(properties, {"event_version", "trade"})
+    _assert_required(properties["event_version"], {"const"})
     event_version = properties["event_version"]["const"]
 
-    if event_version != folder_version:
+    if event_version != schema_version:
         raise ValueError(
             f"{schema_path}: event_version const {event_version!r} "
-            f"does not match folder version {folder_version!r}"
+            f"does not match folder version {schema_version!r}"
         )
 
     title = schema["title"]
-    if folder_version not in title:
+    expected_title = f"{domain}.{event}.{folder_version}"
+    if title != expected_title:
         raise ValueError(
-            f"{schema_path}: schema title {title!r} does not include "
-            f"folder version {folder_version!r}"
+            f"{schema_path}: schema title {title!r} does not match "
+            f"expected title {expected_title!r}"
         )
 
     schema_id = schema["$id"]
-    if folder_version not in schema_id:
+    expected_schema_path = f"schemas/{domain}/{event}/{folder_version}/schema.json"
+    if not schema_id.endswith(expected_schema_path):
         raise ValueError(
-            f"{schema_path}: schema $id {schema_id!r} does not include "
-            f"folder version {folder_version!r}"
+            f"{schema_path}: schema $id {schema_id!r} does not end with "
+            f"expected schema path {expected_schema_path!r}"
         )
-
+
     return folder_version
-
+
+
 
 def _validate_examples(schema_path: Path, schema: dict) -> None:
     examples_dir = schema_path.parent / "examples"
@@ -69,11 +94,16 @@ def _validate_examples(schema_path: Path, schema: dict) -> None:
 
     _assert_required(valid, {"event_type", "event_version", "trade"})
 
-    folder_version = schema_path.parent.name
-    if valid["event_version"] != folder_version:
+    domain, event, folder_version = _schema_coordinates(schema_path)
+    schema_version = folder_version[1:]
+    if valid["event_type"] != event:
+        raise ValueError(
+            f"{valid_example}: event_type {valid['event_type']!r} does not match event folder {event!r}"
+        )
+    if valid["event_version"] != schema_version:
         raise ValueError(
             f"{valid_example}: event_version {valid['event_version']!r} "
-            f"does not match folder version {folder_version!r}"
+            f"does not match folder version {schema_version!r}"
         )
 
     trade_required = set(schema["properties"]["trade"]["required"])
@@ -84,10 +114,15 @@ def _validate_examples(schema_path: Path, schema: dict) -> None:
         invalid = _load_json(invalid_example)
         _assert_required(invalid, {"event_type", "event_version", "trade"})
 
-        if invalid["event_version"] != folder_version:
+        if invalid["event_type"] != event:
+            raise ValueError(
+                f"{invalid_example}: event_type {invalid['event_type']!r} does not match event folder {event!r}"
+            )
+
+        if invalid["event_version"] != schema_version:
             raise ValueError(
                 f"{invalid_example}: event_version {invalid['event_version']!r} "
-                f"does not match folder version {folder_version!r}"
+                f"does not match folder version {schema_version!r}"
             )
 
         invalid_trade = invalid["trade"]
