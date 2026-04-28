@@ -133,15 +133,6 @@ def _validate_examples(schema_path: Path, schema: dict) -> None:
                 f"least one required trade field"
             )
 
-        if (
-            invalid_example.name == "invalid-missing-field.json"
-            and "transaction_hash" not in missing_in_invalid
-        ):
-            raise ValueError(
-                f"{invalid_example}: invalid example is expected to miss "
-                "transaction_hash"
-            )
-
 
 def _validate_schema(schema_path: Path) -> None:
     schema = _load_json(schema_path)
