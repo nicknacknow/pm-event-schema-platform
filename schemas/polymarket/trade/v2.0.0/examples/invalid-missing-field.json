@@ -1,0 +1,14 @@
+{
+  "event_type": "trade",
+  "event_version": "2.0.0",
+  "trade": {
+    "block_number": 82889791,
+    "timestamp": "2026-02-12T12:33:25+00:00",
+    "transaction_hash": "0xd87db9abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234",
+    "wallet": "0x72406a9b4e72f302ec2f14e951247f15f9a34abc",
+    "token_id": "17796870647548868349898422596235951513229476825013849061836962536206243141990",
+    "side": 0,
+    "maker_amount": 46500000,
+    "taker_amount": 50000000
+  }
+}
